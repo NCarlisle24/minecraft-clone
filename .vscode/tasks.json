@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: g++.exe build active file",
+			"command": "C:\\Users\\nlc282\\mingw64\\bin\\g++.exe",
+			"args": [
+				"-fdiagnostics-color=always",
+				"-std=c++17",
+				"-I${workspaceFolder}/include",
+				"-L${workspaceFolder}/lib",
+				"${workspaceFolder}/src/glad.c",
+				"${workspaceFolder}/src/setup.cpp",
+				"${workspaceFolder}/src/shader.cpp",
+				"${workspaceFolder}/src/texture.cpp",
+				"${workspaceFolder}/src/camera.cpp",
+				"${workspaceFolder}/src/main.cpp",
+				"-lglfw3dll",
+				"-o",
+				"${workspaceFolder}/cutable.exe"
+			],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: C:\\Users\\nlc282\\mingw64\\bin\\g++.exe"
+		}
+	]
+}
