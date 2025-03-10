@@ -169,6 +169,18 @@ void Window::enableCapabilities() {
     glEnable(GL_DEPTH_TEST);
 }
 
+
+void Window::toggleWireframeMode() {
+    int polygonMode;
+    glGetIntegerv(GL_POLYGON_MODE, &polygonMode);
+
+    if (polygonMode == GL_FILL) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+}
+
 void Window::unsetAsContext() {
     glfwMakeContextCurrent(NULL);
 }

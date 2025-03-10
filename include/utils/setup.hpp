@@ -60,6 +60,7 @@ class Window {
         void setFramebufferSizeCallback(void (&callback)(GLFWwindow*, int, int));
 
         static void unsetAsContext();
+        static void toggleWireframeMode();
     
     private:
         int initializeGLAD();

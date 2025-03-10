@@ -32,6 +32,7 @@ bool firstMouseFocus = true;
 
 void frameBufferSizeCallback(GLFWwindow* window, int width, int height);
 void mouseCallback(GLFWwindow* window, double mouseX, double mouseY);
+void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(Window* &win);
 void processInputForCamera(Window* &window, Camera* &camera);
 
@@ -52,6 +53,7 @@ int main() {
     // change input settings for mouse; implement in class?
     glfwSetInputMode(win->glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  // hide cursor and set to center of screen
     glfwSetCursorPosCallback(win->glfwWindow, mouseCallback);
+    glfwSetKeyCallback(win->glfwWindow, keyboardInputCallback);
 
     /* ======================================= buffers ======================================= */
 
@@ -71,13 +73,13 @@ int main() {
 
     unsigned int indices[] {
         // front face
-        0, 1, 2,  1, 2, 3,
+        0, 1, 2,  2, 1, 3,
         // left face
-        4, 0, 6,  0, 6, 2,
+        4, 0, 6,  6, 0, 2,
         // back face
-        4, 5, 6,  5, 6, 7,
+        4, 5, 6,  6, 5, 7,
         // right face
-        1, 5, 3,  5, 3, 7
+        1, 5, 3,  3, 5, 7
     };
 
     unsigned int VAO[NUM_VAOS];
@@ -148,7 +150,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // model = glm::rotate(identityMat4, (float)glfwGetTime(), glm::vec3(1.0f, 0.5f, 0.0f));
-        model = identityMat4;
+        model = glm::translate(identityMat4, glm::vec3(0.0f, 0.0f, -2.0f));
         view = getActiveCamera()->getViewMatrix();
         projection = glm::perspective(glm::radians(DEGREE_FOV), (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
 
@@ -248,4 +250,10 @@ void mouseCallback(GLFWwindow* window, double mouseX, double mouseY) {
 
     lastMouseX = mouseX;
     lastMouseY = mouseY;
+}
+
+void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+        Window::toggleWireframeMode();
+    }
 }
