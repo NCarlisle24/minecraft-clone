@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <string>
 #include <cstring>
+#include <cmath>
 #include <fstream>
 #include <unistd.h>
 #include <algorithm>

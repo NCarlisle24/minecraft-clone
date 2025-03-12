@@ -1,19 +1,14 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include <utils/setup.hpp>
-#include <utils/shader.hpp>
-#include <utils/texture.hpp>
-#include <utils/camera.hpp>
+#include "utils.hpp"
 
 #define INITIAL_SCR_WIDTH 1000
 #define INITIAL_SCR_HEIGHT 500
 
-#define DEGREE_FOV 45.0f
-#define NEAR_PLANE 0.1f
-#define FAR_PLANE 100.0f
-
 #define NUM_VAOS 1
 #define NUM_VBOS 1
 #define NUM_EBOS 1
+
+#define NUM_BLOCKS 5
 
 #define BASE_VERT_FILE_PATH "src/shaders/base.vert"
 #define BASE_FRAG_FILE_PATH "src/shaders/base.frag"
@@ -36,8 +31,8 @@ void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action
 void processInput(Window* &win);
 void processInputForCamera(Window* &window, Camera* &camera);
 
-Camera camera1;
-Camera camera2;
+Camera mainCamera;
+Camera debugCamera;
 
 int main() {
     /* ======================================= setup ======================================= */
@@ -57,30 +52,15 @@ int main() {
 
     /* ======================================= buffers ======================================= */
 
-    float vertices[] = {
-        // front face
-        -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,    1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,    1.0f, 1.0f,
+    glm::vec3 blockPositions[NUM_BLOCKS * NUM_BLOCKS * NUM_BLOCKS];
 
-        // back face
-        -0.5f, -0.5f, -0.5f,    1.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f, 1.0f
-    };
-
-    unsigned int indices[] {
-        // front face
-        0, 1, 2,  2, 1, 3,
-        // left face
-        4, 0, 6,  6, 0, 2,
-        // back face
-        4, 5, 6,  6, 5, 7,
-        // right face
-        1, 5, 3,  3, 5, 7
-    };
+    for (int x = 0; x < NUM_BLOCKS; x++) {
+        for (int y = 0; y < NUM_BLOCKS; y++) {
+            for (int z = 0; z < NUM_BLOCKS; z++) {
+                blockPositions[x * NUM_BLOCKS * NUM_BLOCKS + y * NUM_BLOCKS + z] = 1.1f * glm::vec3(x, y, z);
+            }
+        }
+    }
 
     unsigned int VAO[NUM_VAOS];
 
@@ -91,21 +71,24 @@ int main() {
 
     glGenBuffers(NUM_EBOS, EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(blockIndices), blockIndices, GL_STATIC_DRAW);
 
     unsigned int VBO[NUM_VBOS];
 
     glGenBuffers(NUM_VBOS, VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(blockVertices), blockVertices, GL_STATIC_DRAW);
 
-    const int stride = sizeof(float)*5;
+    const int stride = sizeof(Vertex);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(sizeof(float) * 3));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, stride, (void*)(sizeof(float) * 5));
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 
@@ -114,21 +97,14 @@ int main() {
     Shader* baseShader = new Shader(BASE_VERT_FILE_PATH, BASE_FRAG_FILE_PATH);
 
     baseShader->use();
-    baseShader->setUniform1i("wallTexture", 0);
-    baseShader->setUniform1i("smileTexture", 1);
+    baseShader->setUniform1i("textureAtlas", 0);
     baseShader->unuse();
 
     /* ======================================= textures ======================================= */
 
     setActiveTextureUnit(0);
 
-    Texture2D* doorTexture = new Texture2D("./src/textures/wall.jpg");
-
-    setActiveTextureUnit(1);
-
-    setTextureVerticalOrientation(FLIP);
-    Texture2D* smileTexture = new Texture2D("./src/textures/smile.png");
-    setTextureVerticalOrientation(NORMAL);
+    Texture2D* textureAtlas = new Texture2D("./src/textures/wall.jpg");
 
     /* ======================================= transforms ======================================= */
 
@@ -140,7 +116,7 @@ int main() {
 
     glBindVertexArray(VAO[0]);
     baseShader->use();
-    camera1.setAsActiveCamera();
+    mainCamera.setAsActiveCamera();
 
     while (!(win->shouldClose())) {
         currentTime = glfwGetTime();
@@ -150,15 +126,17 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // model = glm::rotate(identityMat4, (float)glfwGetTime(), glm::vec3(1.0f, 0.5f, 0.0f));
-        model = glm::translate(identityMat4, glm::vec3(0.0f, 0.0f, -2.0f));
         view = getActiveCamera()->getViewMatrix();
-        projection = glm::perspective(glm::radians(DEGREE_FOV), (float)screenWidth / (float)screenHeight, NEAR_PLANE, FAR_PLANE);
+        projection = getActiveCamera()->getProjectionMatrix((float)screenWidth / (float)screenHeight);
 
-        baseShader->setUniformMat4("model", model);
         baseShader->setUniformMat4("view", view);
         baseShader->setUniformMat4("projection", projection);
 
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+        for (int i = 0; i < NUM_BLOCKS * NUM_BLOCKS * NUM_BLOCKS; i++) {
+            model = glm::translate(identityMat4, blockPositions[i]);
+            baseShader->setUniformMat4("model", model);
+            glDrawElements(GL_TRIANGLES, sizeof(blockIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
+        }
 
         win->swapBuffers();
         glfwPollEvents();
@@ -167,8 +145,7 @@ int main() {
     }
 
     delete baseShader;
-    delete doorTexture;
-    delete smileTexture;
+    delete textureAtlas;
 
     glDeleteBuffers(NUM_VBOS, VBO);
     glDeleteBuffers(NUM_EBOS, EBO);
@@ -198,6 +175,12 @@ void processInput(Window* &window) {
 }
 
 void processInputForCamera(Window* &window, Camera* &camera) {
+    // std::cout << "Camera position: (" << camera->position.x << ", " << camera->position.y << ", " << camera->position.z << ")" << std::endl;
+    // std::cout << "Camera direction angles: (" << camera->getDirectionAngles().x << ", " << camera->getDirectionAngles().y
+    //           << ", " << camera->getDirectionAngles().z << ")" << std::endl;
+    // std::cout << "Camera direction: (" << camera->getDirectionVector().x << ", " << camera->getDirectionVector().y
+    //           << ", " << camera->getDirectionVector().z << ")" << std::endl;
+
     glm::vec3 horizontalMovementVector = zeroVec3;
 
     if (window->isPressed(GLFW_KEY_W)) {

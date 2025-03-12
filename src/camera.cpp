@@ -4,36 +4,60 @@ Camera* Camera::currentlyActiveCamera = NULL;
 float Camera::horizontalMovementSpeed = DEFAULT_CAMERA_HORIZONTAL_MOVEMENT_SPEED;
 float Camera::verticalMovementSpeed = DEFAULT_CAMERA_VERTICAL_MOVEMENT_SPEED;
 float Camera::mouseSensitivity = DEFAULT_MOUSE_CAMERA_SENSITIVITY;
+float Camera::fov = DEFAULT_DEGREE_FOV;
+float Camera::nearPlane = DEFAULT_NEAR_PLANE;
+float Camera::farPlane = DEFAULT_FAR_PLANE;
 
 Camera* getActiveCamera() {
     return Camera::currentlyActiveCamera;
 }
 
 Camera::Camera() {
-    right = rightVec3;
-    left = leftVec3;
-    forward = inVec3;
-    backward = outVec3;
-    up = upVec3;
-    down = downVec3;
-
-    directionAngles.x = -90.0f;
+    // (0, 0, 0) points in positive x direction
+    directionAngles.x = 90.0f; // point in positive z direction by default
     directionAngles.y = 0.0f;
     directionAngles.z = 0.0f;
 
-    position = zeroVec3;
-    direction = inVec3;
-    horizontalDirection = inVec3;
+    updateDirectionVectors();
+}
+
+void Camera::updateDirectionVectors() {
+    if (directionAngles.x == 90.0f) { // positive z
+        horizontalDirection.x = 0.0f;
+        horizontalDirection.z = 1.0f;
+    } else if (directionAngles.x == -90.0f) { // negative z
+        horizontalDirection.x = 0.0f;
+        horizontalDirection.z = -1.0f;
+    } else if (directionAngles.x == 0.0f){ // positive x
+        horizontalDirection.x = 1.0f;
+        horizontalDirection.z = 0.0f;
+    } else if (directionAngles.x == 180.0f) { // negative x
+        horizontalDirection.x = -1.0f;
+        horizontalDirection.z = 0.0f;
+    } else {
+        horizontalDirection.x = cos(glm::radians(directionAngles.x));
+        horizontalDirection.z = sin(glm::radians(directionAngles.x));
+    }
+
+    if (directionAngles.y >= 90.0f) {
+            directionAngles.y = 90.0f;
+            direction = upVec3;
+    } else if (directionAngles.y <= -90.0f) {
+            directionAngles.y = -90.0f;
+            direction = downVec3;
+    } else { // rotate horizontal vector up by directionAngles.y
+        direction = glm::rotate(identityMat4, glm::radians(directionAngles.y), glm::cross(horizontalDirection, upVec3))
+                    * glm::vec4(horizontalDirection, 1.0f);
+    }
+
+    updateAxisVectors();
 }
 
 void Camera::updateAxisVectors() {
-    forward = direction;
-    backward = -1.0f * forward;
-
     right = glm::cross(horizontalDirection, upVec3);
     left = -1.0f * right;
 
-    up = glm::cross(right, forward);
+    up = glm::cross(right, horizontalDirection);
     down = -1.0f * up;
 }
 
@@ -68,11 +92,15 @@ glm::mat4 Camera::calculateViewMatrixToTarget(const glm::vec3 &target) {
     return rotation * translation;
 }
 
+glm::mat4 Camera::getProjectionMatrix(const float &aspectRatio) {
+    return glm::perspective(glm::radians(DEFAULT_DEGREE_FOV), aspectRatio, DEFAULT_NEAR_PLANE, DEFAULT_FAR_PLANE);
+}
+
 glm::mat4 Camera::getViewMatrix() {
     return calculateViewMatrixToTarget(position + direction);
 }
 
-void Camera::setDirection(const glm::vec3 &newDirection) {
+void Camera::setDirectionVector(const glm::vec3 &newDirection) {
     if (newDirection == zeroVec3) {
         std::cout << "Error: Zero vector passed as argument to Camera::setDirection()." << std::endl;
         return;
@@ -80,18 +108,23 @@ void Camera::setDirection(const glm::vec3 &newDirection) {
 
     direction = glm::normalize(newDirection);
 
-    horizontalDirection.x = newDirection.x;
-    horizontalDirection.z = newDirection.z;
-    horizontalDirection = glm::normalize(horizontalDirection);
+    if (!(newDirection.x == 0.0f && newDirection.z == 0.0f)) {
+        horizontalDirection.x = newDirection.x;
+        horizontalDirection.z = newDirection.z;
+        horizontalDirection = glm::normalize(horizontalDirection);
 
-    directionAngles.x = glm::degrees(atan2(direction.x, direction.y));
+        directionAngles.x = glm::degrees(atan2(direction.x, direction.y));
+    }
+
     directionAngles.y = glm::degrees(asin(direction.y));
     // keep roll the same
+
+    direction = newDirection;
 
     updateAxisVectors();
 }
 
-void Camera::setDirection(const glm::vec3 &newDirectionAngles, const bool &inRadians) {
+void Camera::setDirectionAngles(const glm::vec3 &newDirectionAngles, const bool &inRadians) {
     if (inRadians) {
         directionAngles.x = glm::degrees(newDirectionAngles.x);
         directionAngles.y = glm::degrees(newDirectionAngles.y);
@@ -104,21 +137,7 @@ void Camera::setDirection(const glm::vec3 &newDirectionAngles, const bool &inRad
 
     directionAngles.x -= floor(directionAngles.x / 360) * 360.0f;
 
-    horizontalDirection.x = cos(glm::radians(directionAngles.x));
-    horizontalDirection.z = sin(glm::radians(directionAngles.x));
-
-    if (directionAngles.y >= 90.0f) {
-            directionAngles.y = 90.0f;
-            direction = upVec3;
-    } else if (directionAngles.y <= -90.0f) {
-            directionAngles.y = -90.0f;
-            direction = downVec3;
-    } else { // rotate horizontal vector up by directionAngles.y
-        direction = glm::rotate(identityMat4, glm::radians(directionAngles.y), glm::cross(horizontalDirection, upVec3))
-                    * glm::vec4(horizontalDirection, 1.0f);
-    }
-
-    updateAxisVectors();
+    updateDirectionVectors();
 }
 
 void Camera::rotateDirection(const glm::vec3 &deltaAngles, const bool &inRadians) {
@@ -132,22 +151,7 @@ void Camera::rotateDirection(const glm::vec3 &deltaAngles, const bool &inRadians
     // clamp yaw
     directionAngles.x -= floor(directionAngles.x / 360) * 360.0f;
 
-    // calculate horizontal direction
-    horizontalDirection.x = cos(glm::radians(directionAngles.x));
-    horizontalDirection.z = sin(glm::radians(directionAngles.x));
-
-    if (directionAngles.y >= 90.0f) {
-            directionAngles.y = 90.0f;
-            direction = upVec3;
-    } else if (directionAngles.y <= -90.0f) {
-            directionAngles.y = -90.0f;
-            direction = downVec3;
-    } else { // rotate horizontal vector up by directionAngles.y
-        direction = glm::rotate(identityMat4, glm::radians(directionAngles.y), glm::cross(horizontalDirection, upVec3))
-                    * glm::vec4(horizontalDirection, 1.0f);
-    }
-
-    updateAxisVectors();
+    updateDirectionVectors();
 }
 
 glm::vec3 Camera::getDirectionVector() {

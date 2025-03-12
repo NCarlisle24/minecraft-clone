@@ -15,6 +15,7 @@
 				"${workspaceFolder}/src/shader.cpp",
 				"${workspaceFolder}/src/texture.cpp",
 				"${workspaceFolder}/src/camera.cpp",
+				"${workspaceFolder}/src/block.cpp",
 				"${workspaceFolder}/src/main.cpp",
 				"-lglfw3dll",
 				"-o",

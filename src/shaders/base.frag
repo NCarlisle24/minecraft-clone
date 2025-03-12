@@ -4,9 +4,13 @@ out vec4 FragColor;
 
 in vec2 inTexCoord;
 
-uniform sampler2D wallTexture;
-uniform sampler2D smileTexture;
+uniform sampler2D textureAtlas;
 
 void main() {
-    FragColor = mix(texture(wallTexture, inTexCoord), texture(smileTexture, inTexCoord), 0.2f);
+    vec4 texColor = texture(textureAtlas, inTexCoord);
+
+    if (texColor.a < 0.1)
+        discard;
+
+    FragColor = texColor;
 }
