@@ -4,17 +4,8 @@
 #define INITIAL_SCR_WIDTH 1000
 #define INITIAL_SCR_HEIGHT 500
 
-#define NUM_VAOS 1
-#define NUM_VBOS 1
-#define NUM_EBOS 1
-
-#define NUM_BLOCKS 5
-
 #define BASE_VERT_FILE_PATH "src/shaders/base.vert"
 #define BASE_FRAG_FILE_PATH "src/shaders/base.frag"
-
-int screenWidth = INITIAL_SCR_WIDTH;
-int screenHeight = INITIAL_SCR_HEIGHT;
 
 float currentTime = 0.0f;
 float lastFrameTime = 0.0f;
@@ -25,14 +16,14 @@ float lastMouseY;
 
 bool firstMouseFocus = true;
 
-void frameBufferSizeCallback(GLFWwindow* window, int width, int height);
 void mouseCallback(GLFWwindow* window, double mouseX, double mouseY);
 void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void processInput(Window* &win);
-void processInputForCamera(Window* &window, Camera* &camera);
+void processInput(Window* const &win);
+void processInputForCamera(Window* const &window, Camera* const &camera);
 
 Camera mainCamera;
 Camera debugCamera;
+Renderer* renderer;
 
 int main() {
     /* ======================================= setup ======================================= */
@@ -43,7 +34,6 @@ int main() {
 
     Window* win = new Window(INITIAL_SCR_WIDTH, INITIAL_SCR_HEIGHT, "This is a title");
     win->setAsContext();
-    win->setFramebufferSizeCallback(frameBufferSizeCallback);
 
     // change input settings for mouse; implement in class?
     glfwSetInputMode(win->glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  // hide cursor and set to center of screen
@@ -71,8 +61,8 @@ int main() {
 
     /* ======================================= main loop ======================================= */
 
+    renderer = new Renderer();
     mainCamera.setAsActiveCamera();
-    Renderer* renderer = new Renderer();
 
     while (!(win->shouldClose())) {
         // pre-render setup
@@ -83,7 +73,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // rendering
-        renderer->render(win, &mainCamera, baseShader);
+        renderer->render(win, getActiveCamera(), baseShader);
 
         win->swapBuffers();
         
@@ -103,13 +93,7 @@ int main() {
     return 0;
 }
 
-void frameBufferSizeCallback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-    screenWidth = width;
-    screenHeight = height;
-}
-
-void processInput(Window* &window) {
+void processInput(Window* const &window) {
     if (window->isPressed(GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window->glfwWindow, GLFW_TRUE);
     }
@@ -121,7 +105,7 @@ void processInput(Window* &window) {
     }
 }
 
-void processInputForCamera(Window* &window, Camera* &camera) {
+void processInputForCamera(Window* const &window, Camera* const &camera) {
     // std::cout << "Camera position: (" << camera->position.x << ", " << camera->position.y << ", " << camera->position.z << ")" << std::endl;
     // std::cout << "Camera direction angles: (" << camera->getDirectionAngles().x << ", " << camera->getDirectionAngles().y
     //           << ", " << camera->getDirectionAngles().z << ")" << std::endl;
