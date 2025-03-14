@@ -50,48 +50,6 @@ int main() {
     glfwSetCursorPosCallback(win->glfwWindow, mouseCallback);
     glfwSetKeyCallback(win->glfwWindow, keyboardInputCallback);
 
-    /* ======================================= buffers ======================================= */
-
-    glm::vec3 blockPositions[NUM_BLOCKS * NUM_BLOCKS * NUM_BLOCKS];
-
-    for (int x = 0; x < NUM_BLOCKS; x++) {
-        for (int y = 0; y < NUM_BLOCKS; y++) {
-            for (int z = 0; z < NUM_BLOCKS; z++) {
-                blockPositions[x * NUM_BLOCKS * NUM_BLOCKS + y * NUM_BLOCKS + z] = 1.1f * glm::vec3(x, y, z);
-            }
-        }
-    }
-
-    unsigned int VAO[NUM_VAOS];
-
-    glGenVertexArrays(NUM_VAOS, VAO);
-    glBindVertexArray(VAO[0]);
-
-    unsigned int EBO[NUM_EBOS];
-
-    glGenBuffers(NUM_EBOS, EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(blockIndices), blockIndices, GL_STATIC_DRAW);
-
-    unsigned int VBO[NUM_VBOS];
-
-    glGenBuffers(NUM_VBOS, VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(blockVertices), blockVertices, GL_STATIC_DRAW);
-
-    const int stride = sizeof(Vertex);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, stride, (void*)(sizeof(float) * 5));
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
-
     /* ======================================= shaders ======================================= */
 
     Shader* baseShader = new Shader(BASE_VERT_FILE_PATH, BASE_FRAG_FILE_PATH);
@@ -103,7 +61,6 @@ int main() {
     /* ======================================= textures ======================================= */
 
     setActiveTextureUnit(0);
-
     Texture2D* textureAtlas = new Texture2D("./src/textures/wall.jpg");
 
     /* ======================================= transforms ======================================= */
@@ -114,42 +71,32 @@ int main() {
 
     /* ======================================= main loop ======================================= */
 
-    glBindVertexArray(VAO[0]);
-    baseShader->use();
     mainCamera.setAsActiveCamera();
+    Renderer* renderer = new Renderer();
 
     while (!(win->shouldClose())) {
+        // pre-render setup
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastFrameTime;
 
         processInput(win);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // model = glm::rotate(identityMat4, (float)glfwGetTime(), glm::vec3(1.0f, 0.5f, 0.0f));
-        view = getActiveCamera()->getViewMatrix();
-        projection = getActiveCamera()->getProjectionMatrix((float)screenWidth / (float)screenHeight);
-
-        baseShader->setUniformMat4("view", view);
-        baseShader->setUniformMat4("projection", projection);
-
-        for (int i = 0; i < NUM_BLOCKS * NUM_BLOCKS * NUM_BLOCKS; i++) {
-            model = glm::translate(identityMat4, blockPositions[i]);
-            baseShader->setUniformMat4("model", model);
-            glDrawElements(GL_TRIANGLES, sizeof(blockIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, (void*)0);
-        }
+        // rendering
+        renderer->render(win, &mainCamera, baseShader);
 
         win->swapBuffers();
-        glfwPollEvents();
+        
 
+        // post-render stuff
+        glfwPollEvents();
         lastFrameTime = currentTime;
     }
 
+    delete renderer;
     delete baseShader;
     delete textureAtlas;
-
-    glDeleteBuffers(NUM_VBOS, VBO);
-    glDeleteBuffers(NUM_EBOS, EBO);
-    glDeleteVertexArrays(NUM_VAOS, VAO);
+    delete win;
 
     glfwTerminate();
 
@@ -223,7 +170,7 @@ void mouseCallback(GLFWwindow* window, double mouseX, double mouseY) {
     const float mouseDeltaX = mouseX - lastMouseX;
     const float mouseDeltaY = lastMouseY - mouseY;
 
-    Camera* camera = Camera::currentlyActiveCamera;
+    Camera* camera = getActiveCamera();
 
     camera->rotateDirection(camera->mouseSensitivity * glm::vec3(mouseDeltaX, mouseDeltaY, 0.0f));
 

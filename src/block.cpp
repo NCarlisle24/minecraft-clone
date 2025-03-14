@@ -1,6 +1,6 @@
 #include <utils/block.hpp>
 
-const Vertex blockVertices[24] = {
+const BlockVertex blockVertices[BLOCK_VERTICES_LENGTH] = {
     // front face
     { 0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  NEG_Z },
     { 1.0f, 0.0f, 0.0f,  1.0f, 0.0f,  NEG_Z },
@@ -38,7 +38,7 @@ const Vertex blockVertices[24] = {
     { 1.0f, 1.0f, 0.0f,  1.0f, 1.0f,  POS_Y },
 };
 
-const unsigned int blockIndices[36] {
+const unsigned int blockIndices[BLOCK_INDICES_LENGTH] {
     0, 1, 2, 2, 1, 3,
     4, 5, 6, 6, 5, 7,
     8, 9, 10, 10, 9, 11,

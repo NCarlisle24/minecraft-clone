@@ -3,15 +3,9 @@
 
 #include <utils/setup.hpp>
 
-typedef struct {
-    float x, y, z;
-    float u, v;
-    unsigned int faceDirection;
-} Vertex;
-
-extern const Vertex blockVertices[24];
-extern const unsigned int blockIndices[36];
-
+#define CHUNK_SIZE 32
+#define BLOCK_VERTICES_LENGTH 24
+#define BLOCK_INDICES_LENGTH 36
 typedef enum {
     POS_X,
     NEG_X,
@@ -20,6 +14,14 @@ typedef enum {
     POS_Z,
     NEG_Z
 } FaceDirection;
+typedef struct {
+    float x, y, z;
+    float u, v;
+    FaceDirection faceDirection;
+} BlockVertex;
+
+extern const BlockVertex blockVertices[BLOCK_VERTICES_LENGTH];
+extern const unsigned int blockIndices[BLOCK_INDICES_LENGTH];
 
 typedef struct {
     unsigned int id;

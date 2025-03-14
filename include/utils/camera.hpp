@@ -14,7 +14,7 @@
 
 class Camera {
     public:
-        static Camera* currentlyActiveCamera;
+        static Camera* activeCamera;
         static float horizontalMovementSpeed;
         static float verticalMovementSpeed;
         static float mouseSensitivity;

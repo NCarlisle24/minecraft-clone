@@ -1,6 +1,6 @@
 #include <utils/camera.hpp>
 
-Camera* Camera::currentlyActiveCamera = NULL;
+Camera* Camera::activeCamera = NULL;
 float Camera::horizontalMovementSpeed = DEFAULT_CAMERA_HORIZONTAL_MOVEMENT_SPEED;
 float Camera::verticalMovementSpeed = DEFAULT_CAMERA_VERTICAL_MOVEMENT_SPEED;
 float Camera::mouseSensitivity = DEFAULT_MOUSE_CAMERA_SENSITIVITY;
@@ -9,7 +9,7 @@ float Camera::nearPlane = DEFAULT_NEAR_PLANE;
 float Camera::farPlane = DEFAULT_FAR_PLANE;
 
 Camera* getActiveCamera() {
-    return Camera::currentlyActiveCamera;
+    return Camera::activeCamera;
 }
 
 Camera::Camera() {
@@ -167,13 +167,13 @@ glm::vec3 Camera::getDirectionAngles() {
 }
 
 void Camera::setAsActiveCamera() {
-    currentlyActiveCamera = this;
+    activeCamera = this;
 }
 
 bool Camera::isActive() {
-    return (currentlyActiveCamera == this);
+    return (activeCamera == this);
 }
 
 void Camera::unsetAsActiveCamera() {
-    currentlyActiveCamera = NULL;
+    activeCamera = NULL;
 }
