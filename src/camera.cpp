@@ -91,7 +91,7 @@ glm::mat4 Camera::calculateProjectionMatrix(const float &aspectRatio) {
 
 void Camera::setDirectionVector(const glm::vec3 &newDirection) {
     if (newDirection == zeroVec3) {
-        std::cout << "Error: Zero vector passed as argument to Camera::setDirection()." << std::endl;
+        std::cerr << "Error: Zero vector passed as argument to Camera::setDirection()." << std::endl;
         return;
     }
 

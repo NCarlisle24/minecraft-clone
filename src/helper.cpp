@@ -17,7 +17,7 @@ std::string readFile(const char* fileName) {
     std::ifstream file(fileName);
 
     if (!file.is_open()) {
-        std::cout << "File '" << fileName << "' not found." << std::endl;
+        std::cerr << "File '" << fileName << "' not found." << std::endl;
         return NULL;
     }
 

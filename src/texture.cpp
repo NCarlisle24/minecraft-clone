@@ -12,7 +12,7 @@ GLenum getColorFormat(const char* fileName) {
         free(extension);
         return GL_RGB;
     } else {
-        std::cout << "Unknown color format for '" << fileName << "'; assuming RGB." << std::endl;
+        std::cout << "Warning: Unknown color format for '" << fileName << "'; assuming RGB." << std::endl;
         free(extension);
         return GL_RGB;
     }
@@ -23,7 +23,7 @@ void setActiveTextureUnit(const int &unit) {
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 
     if (unit < 0 || unit > maxTextureUnits) {
-        std::cout << "Invalid texture unit " << unit << ". Valid texture units range from 0 to " << 
+        std::cerr << "Error: Invalid texture unit " << unit << ". Valid texture units range from 0 to " << 
                       maxTextureUnits << "." << std::endl;
     }
 
@@ -54,14 +54,14 @@ void setTextureVerticalOrientation(const Orientation &orientation) {
 
 Texture2D::Texture2D(const char* filePath, const GLenum &internalFormat) {
     if (!fileExists(filePath)) {
-        std::cout << "File '" << filePath << "' not found." << std::endl;
+        std::cerr << "Error: File '" << filePath << "' not found." << std::endl;
         return;
     }
 
     GLenum fileFormat = getColorFormat(filePath);
 
     if (fileFormat == ERROR) {
-        std::cout << "Invalid texture file '" << filePath << "'." << std::endl;
+        std::cerr << "Error: Invalid texture file '" << filePath << "'." << std::endl;
         return;
     }
 
@@ -74,7 +74,7 @@ Texture2D::Texture2D(const char* filePath, const GLenum &internalFormat) {
     unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
 
     if (!data) {
-        std::cout << "Failed to load texture data from '" << filePath << "'." << std::endl;
+        std::cerr << "Error: Failed to load texture data from '" << filePath << "'." << std::endl;
         return;
     }
 

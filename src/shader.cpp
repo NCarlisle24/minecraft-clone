@@ -1,13 +1,12 @@
 #include <utils/shader.hpp>
 
-
 unsigned int createShader(const char* fileName, const GLenum &shaderType) {
     int success;
     char infoLog[INFO_LOG_LENGTH];
 
     unsigned int shader = glCreateShader(shaderType);
     if (shader == GL_INVALID_ENUM) {
-        std::cout << "Invalid shader type for '" << fileName << "'." << std::endl;
+        std::cerr << "Error: Invalid shader type for '" << fileName << "'." << std::endl;
         return GL_INVALID_ENUM;
     }
 
@@ -20,7 +19,7 @@ unsigned int createShader(const char* fileName, const GLenum &shaderType) {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(shader, INFO_LOG_LENGTH, NULL, infoLog);
-        std::cout << "Error: Shader compilation failed for '" << fileName
+        std::cerr << "Error: Shader compilation failed for '" << fileName
                   << "'." << std::endl << infoLog;
     }
 
@@ -43,7 +42,7 @@ Shader::Shader(const char* vertShaderName, const char* fragShaderName) {
     glGetProgramiv(id, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(id, INFO_LOG_LENGTH, NULL, infoLog);
-        std::cout << "Error: Shader program link failed for '" << vertShaderName
+        std::cerr << "Error: Shader program link failed for '" << vertShaderName
                   << "' and '" << fragShaderName << "'." << std::endl
                   << infoLog << std::endl;
     }

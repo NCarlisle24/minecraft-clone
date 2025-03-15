@@ -10,7 +10,7 @@ int main() {
     /* ======================================= setup ======================================= */
     
     if (setupGLFW() == ERROR) {
-        std::cout << "Error: Failed to initialize GLFW." << std::endl;
+        std::cerr << "Error: Failed to initialize GLFW." << std::endl;
         return 1;
     }
 

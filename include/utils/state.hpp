@@ -4,11 +4,12 @@
 #include <utils/helper.hpp>
 #include <utils/renderer.hpp> // includes window, camera, and shader
 #include <utils/texture.hpp>
+#include <utils/block.hpp>
 
 #define INITIAL_SCR_WIDTH 1000
 #define INITIAL_SCR_HEIGHT 500
 
-#define DEFAULT_SHADER_KEY "base"
+#define DEFAULT_RENDER_DISTANCE 4 // in chunks
 
 extern bool glfwIsInitialized;
 
@@ -30,6 +31,7 @@ class State {
         float aspectRatio = (float) INITIAL_SCR_WIDTH / (float) INITIAL_SCR_HEIGHT;
         int windowWidth = INITIAL_SCR_WIDTH;
         int windowHeight = INITIAL_SCR_HEIGHT;
+        int renderDistance = DEFAULT_RENDER_DISTANCE;
 
         ~State();
 
