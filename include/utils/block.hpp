@@ -1,7 +1,7 @@
 #ifndef BLOCK_HPP
 #define BLOCK_HPP
 
-#include <utils/setup.hpp>
+#include <utils/helper.hpp>
 
 #define CHUNK_SIZE 32
 #define BLOCK_VERTICES_LENGTH 24

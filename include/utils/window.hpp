@@ -1,17 +1,17 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#include <utils/setup.hpp>
+#include <utils/helper.hpp>
 
 #define DEFAULT_SCR_WIDTH 800
 #define DEFAULT_SCR_HEIGHT 600
 
-void defaultFrameBufferSizeCallback(GLFWwindow* window, int width, int height);
-
+static void defaultFrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 class Window {
     public:
         GLFWwindow* glfwWindow;
         bool gladIsInitialized;
+        bool firstMouseFocus = true;
 
         Window(const int &width = DEFAULT_SCR_WIDTH, const int &height = DEFAULT_SCR_HEIGHT,
                const char* title = "(default title)");
@@ -22,16 +22,13 @@ class Window {
         bool isPressed(const int &key);
         void swapBuffers();
 
-        void setFramebufferSizeCallback(void (&callback)(GLFWwindow*, int, int));
-
-        void getFramebufferSize(int* const &width, int* const &height);
+        void setUserPointer(void* const &pointer);
+        void* getUserPointer();
 
         static void unsetAsContext();
-        static void toggleWireframeMode();
 
     private:
         int initializeGLAD();
-        static void enableCapabilities();
 };
 
 #endif

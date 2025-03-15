@@ -1,24 +1,22 @@
 #include <utils/camera.hpp>
 
-Camera* Camera::activeCamera = NULL;
 float Camera::horizontalMovementSpeed = DEFAULT_CAMERA_HORIZONTAL_MOVEMENT_SPEED;
 float Camera::verticalMovementSpeed = DEFAULT_CAMERA_VERTICAL_MOVEMENT_SPEED;
 float Camera::mouseSensitivity = DEFAULT_MOUSE_CAMERA_SENSITIVITY;
-float Camera::fov = DEFAULT_DEGREE_FOV;
-float Camera::nearPlane = DEFAULT_NEAR_PLANE;
-float Camera::farPlane = DEFAULT_FAR_PLANE;
 
-Camera* getActiveCamera() {
-    return Camera::activeCamera;
-}
-
-Camera::Camera() {
+Camera::Camera(const float &aspectRatio) {
     // (0, 0, 0) points in positive x direction
     directionAngles.x = 90.0f; // point in positive z direction by default
     directionAngles.y = 0.0f;
     directionAngles.z = 0.0f;
 
     updateDirectionVectors();
+
+    updateTranslationViewMatrix();
+    updateRotationViewMatrix();
+    updateViewMatrix();
+
+    updateProjectionMatrix(aspectRatio);
 }
 
 void Camera::updateDirectionVectors() {
@@ -55,49 +53,40 @@ void Camera::updateDirectionVectors() {
 
 void Camera::updateAxisVectors() {
     right = glm::cross(horizontalDirection, upVec3);
-    left = -1.0f * right;
-
-    up = glm::cross(right, horizontalDirection);
-    down = -1.0f * up;
 }
 
-glm::mat4 Camera::calculateViewMatrixToTarget(const glm::vec3 &target) {
-    glm::vec3 towardTargetZ = glm::normalize(position - target); // directly toward target
-    glm::vec3 towardTargetX; // right/left when facing target (uses world up)
-    
-    if (abs(towardTargetZ.y) == 1.0f) { // if target is straight above or below
-        towardTargetX = glm::cross(horizontalDirection, upVec3);
-    } else {
-        towardTargetX = glm::normalize(glm::cross(upVec3, towardTargetZ));
-    }
+void Camera::updateProjectionMatrix(const float &aspectRatio) {
+    projectionMatrix = calculateProjectionMatrix(aspectRatio);
+}
 
+void Camera::updateViewMatrix() {
+    viewMatrix = rotationViewMatrix * translationViewMatrix;
+}
+
+void Camera::updateTranslationViewMatrix() {
+    translationViewMatrix[3][0] = -position.x;
+    translationViewMatrix[3][1] = -position.y;
+    translationViewMatrix[3][2] = -position.z;
+}
+
+void Camera::updateRotationViewMatrix() {
+    glm::vec3 towardTargetZ = -1.0f * direction; // directly toward target
+    glm::vec3 towardTargetX = glm::cross(horizontalDirection, upVec3);
     glm::vec3 towardTargetY = glm::cross(towardTargetZ, towardTargetX); // up/down when facing target
 
-    glm::mat4 translation = glm::mat4(1.0f);
-    translation[3][0] = -position.x;
-    translation[3][1] = -position.y;
-    translation[3][2] = -position.z;
-
-    glm::mat4 rotation = glm::mat4(1.0f);
-    rotation[0][0] = towardTargetX.x; // first row
-    rotation[1][0] = towardTargetX.y;
-    rotation[2][0] = towardTargetX.z;
-    rotation[0][1] = towardTargetY.x; // second row
-    rotation[1][1] = towardTargetY.y;
-    rotation[2][1] = towardTargetY.z;
-    rotation[0][2] = towardTargetZ.x; // third row
-    rotation[1][2] = towardTargetZ.y;
-    rotation[2][2] = towardTargetZ.z; 
-
-    return rotation * translation;
+    rotationViewMatrix[0][0] = towardTargetX.x; // first row
+    rotationViewMatrix[1][0] = towardTargetX.y;
+    rotationViewMatrix[2][0] = towardTargetX.z;
+    rotationViewMatrix[0][1] = towardTargetY.x; // second row
+    rotationViewMatrix[1][1] = towardTargetY.y;
+    rotationViewMatrix[2][1] = towardTargetY.z;
+    rotationViewMatrix[0][2] = towardTargetZ.x; // third row
+    rotationViewMatrix[1][2] = towardTargetZ.y;
+    rotationViewMatrix[2][2] = towardTargetZ.z; 
 }
 
-glm::mat4 Camera::getProjectionMatrix(const float &aspectRatio) {
+glm::mat4 Camera::calculateProjectionMatrix(const float &aspectRatio) {
     return glm::perspective(glm::radians(DEFAULT_DEGREE_FOV), aspectRatio, DEFAULT_NEAR_PLANE, DEFAULT_FAR_PLANE);
-}
-
-glm::mat4 Camera::getViewMatrix() {
-    return calculateViewMatrixToTarget(position + direction);
 }
 
 void Camera::setDirectionVector(const glm::vec3 &newDirection) {
@@ -122,6 +111,8 @@ void Camera::setDirectionVector(const glm::vec3 &newDirection) {
     direction = newDirection;
 
     updateAxisVectors();
+    updateRotationViewMatrix();
+    updateViewMatrix();
 }
 
 void Camera::setDirectionAngles(const glm::vec3 &newDirectionAngles, const bool &inRadians) {
@@ -138,6 +129,8 @@ void Camera::setDirectionAngles(const glm::vec3 &newDirectionAngles, const bool 
     directionAngles.x -= floor(directionAngles.x / 360) * 360.0f;
 
     updateDirectionVectors();
+    updateRotationViewMatrix();
+    updateViewMatrix();
 }
 
 void Camera::rotateDirection(const glm::vec3 &deltaAngles, const bool &inRadians) {
@@ -152,6 +145,23 @@ void Camera::rotateDirection(const glm::vec3 &deltaAngles, const bool &inRadians
     directionAngles.x -= floor(directionAngles.x / 360) * 360.0f;
 
     updateDirectionVectors();
+    updateRotationViewMatrix();
+    updateViewMatrix();
+}
+void Camera::move(const glm::vec3 &movementVector) {
+    if (movementVector == zeroVec3) return;
+
+    position += movementVector;
+    updateTranslationViewMatrix();
+    updateViewMatrix();
+}
+
+void Camera::setPosition(const glm::vec3 &newPosition) {
+    if (position == newPosition) return;
+
+    position = newPosition;
+    updateTranslationViewMatrix();
+    updateViewMatrix();
 }
 
 glm::vec3 Camera::getDirectionVector() {
@@ -166,14 +176,6 @@ glm::vec3 Camera::getDirectionAngles() {
     return directionAngles;
 }
 
-void Camera::setAsActiveCamera() {
-    activeCamera = this;
-}
-
-bool Camera::isActive() {
-    return (activeCamera == this);
-}
-
-void Camera::unsetAsActiveCamera() {
-    activeCamera = NULL;
+glm::vec3 Camera::getPosition() {
+    return position;
 }

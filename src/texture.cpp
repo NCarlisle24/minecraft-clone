@@ -30,6 +30,13 @@ void setActiveTextureUnit(const int &unit) {
     glActiveTexture(GL_TEXTURE0 + unit);
 }
 
+int getActiveTextureUnit() {
+    int tempTextureUnit;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &tempTextureUnit);
+
+    return tempTextureUnit;
+}
+
 void setTextureParameters() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -73,6 +80,9 @@ Texture2D::Texture2D(const char* filePath, const GLenum &internalFormat) {
 
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, fileFormat, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
+
+    textureUnit = getActiveTextureUnit() - GL_TEXTURE0;
+
     stbi_image_free(data);
 }
 

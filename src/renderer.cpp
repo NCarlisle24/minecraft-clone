@@ -7,7 +7,23 @@ const float testData[] = {
     1.0f, 1.0f, 0.0f
 };
 
+void toggleWireframeMode() {
+    int polygonMode;
+    glGetIntegerv(GL_POLYGON_MODE, &polygonMode);
+
+    if (polygonMode == GL_FILL) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+}
+
 Renderer::Renderer() {
+    if (glfwGetCurrentContext() == NULL) {
+        std::cerr << "Error: No current OpenGL context." << std::endl;
+        return;
+    }
+
     // VAO
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -53,12 +69,8 @@ void Renderer::render(Window* const &window, Camera* const &camera, Shader* cons
     shader->use();
 
     // load matrix uniforms
-    int width;
-    int height;
-    window->getFramebufferSize(&width, &height);
-
-    shader->setUniformMat4("view", camera->getViewMatrix());
-    shader->setUniformMat4("projection", camera->getProjectionMatrix((float)width / (float)height));
+    shader->setUniformMat4("view", camera->viewMatrix);
+    shader->setUniformMat4("projection", camera->projectionMatrix);
 
     // load TBO data
     setActiveTextureUnit(0);

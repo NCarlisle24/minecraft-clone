@@ -1,5 +1,5 @@
-#ifndef SETUP_HPP
-#define SETUP_HPP
+#ifndef HELPER_HPP
+#define HELPER_HPP
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -12,6 +12,9 @@
 #include <fstream>
 #include <unistd.h>
 #include <algorithm>
+#include <unordered_map>
+#include <vector>
+#include <chrono>
 
 #include <stb/stb_image.h>
 #include <glm/glm.hpp>
@@ -20,8 +23,6 @@
 
 #define SUCCESS 0
 #define ERROR -1
-
-extern bool glfwIsInitialized;
 
 extern const glm::mat4 identityMat4;
 
@@ -32,9 +33,6 @@ extern const glm::vec3 rightVec3; // (1.0f, 0.0f, 0.0f)
 extern const glm::vec3 leftVec3; // (-1.0f, 0.0f, 0.0f)
 extern const glm::vec3 inVec3; // (0.0f, 0.0f, -1.0f)
 extern const glm::vec3 outVec3; // (0.0f, 0.0f, 1.0f)
-
-static void glfwErrorCallback(int error, const char* msg);
-int setupGLFW();
 
 std::string readFile(const char* fileName);
 char* getFileExtension(const char* fileName);

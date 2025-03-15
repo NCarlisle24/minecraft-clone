@@ -1,6 +1,4 @@
-#include <utils/setup.hpp>
-
-bool glfwIsInitialized = false;
+#include <utils/helper.hpp>
 
 const glm::mat4 identityMat4(1.0f);
 
@@ -11,34 +9,6 @@ const glm::vec3 rightVec3(1.0f, 0.0f, 0.0f);
 const glm::vec3 leftVec3(-1.0f, 0.0f, 0.0f);
 const glm::vec3 inVec3(0.0f, 0.0f, -1.0f);
 const glm::vec3 outVec3(0.0f, 0.0f, 1.0f);
-
-static void glfwErrorCallback(int error, const char *msg) {
-    std::string s;
-    s = "[" + std::to_string(error) + "] " + msg + '\n';
-    std::cerr << s << std::endl;
-}
-
-int setupGLFW() {
-    glfwSetErrorCallback(glfwErrorCallback);
-
-    if (!glfwInit()) {
-        std::cout << "Failed to initialize GLFW." << std::endl;
-        return ERROR;
-    }
-
-    glfwWindowHint(GLFW_SAMPLES, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    #ifdef __APPLE__
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
-
-    glfwIsInitialized = true;
-
-    return SUCCESS;
-}
 
 std::string readFile(const char* fileName) {
     std::string result;
