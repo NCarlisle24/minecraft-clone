@@ -1,8 +1,8 @@
 #ifndef HELPER_HPP
 #define HELPER_HPP
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <ext/glad/glad.h>
+#include <ext/GLFW/glfw3.h>
 
 #include <iostream>
 #include <stdbool.h>
@@ -16,10 +16,10 @@
 #include <vector>
 #include <chrono>
 
-#include <stb/stb_image.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <ext/stb/stb_image.h>
+#include <ext/glm/glm.hpp>
+#include <ext/glm/gtc/matrix_transform.hpp>
+#include <ext/glm/gtc/type_ptr.hpp>
 
 #define SUCCESS 0
 #define ERROR -1
@@ -33,6 +33,11 @@ extern const glm::vec3 rightVec3; // (1.0f, 0.0f, 0.0f)
 extern const glm::vec3 leftVec3; // (-1.0f, 0.0f, 0.0f)
 extern const glm::vec3 inVec3; // (0.0f, 0.0f, -1.0f)
 extern const glm::vec3 outVec3; // (0.0f, 0.0f, 1.0f)
+
+typedef enum {
+    DEGREES,
+    RADIANS
+} AngleType;
 
 std::string readFile(const char* fileName);
 char* getFileExtension(const char* fileName);

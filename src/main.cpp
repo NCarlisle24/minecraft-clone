@@ -1,5 +1,14 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "utils.hpp"
+
+#include <utils/helper.hpp>
+#include <utils/window.hpp>
+#include <utils/shader.hpp>
+#include <utils/texture.hpp>
+#include <utils/camera.hpp>
+#include <utils/block.hpp>
+#include <utils/renderer.hpp>
+#include <utils/state.hpp>
+#include <entities.hpp>
 
 #define BASE_VERT_FILE_PATH "src/shaders/base.vert"
 #define BASE_FRAG_FILE_PATH "src/shaders/base.frag"
@@ -37,13 +46,16 @@ int main() {
 
     state->textures2D[0] = textureAtlas;
 
-    /* ======================================= cameras ======================================= */
+    /* ======================================= entities ======================================= */
 
     Camera* mainCamera = new Camera(state->aspectRatio);
     Camera* debugCamera = new Camera(state->aspectRatio);
 
-    state->cameras.push_back(mainCamera);
-    state->cameras.push_back(debugCamera);
+    Player* mainPlayer = new Player(mainCamera);
+    Player* debugPlayer = new Player(debugCamera);
+
+    state->entities.push_back(mainPlayer);
+    state->entities.push_back(debugPlayer);
 
     /* ======================================= main loop ======================================= */
 

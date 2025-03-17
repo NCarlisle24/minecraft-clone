@@ -5,6 +5,7 @@
 #include <utils/renderer.hpp> // includes window, camera, and shader
 #include <utils/texture.hpp>
 #include <utils/block.hpp>
+#include <entities.hpp>
 
 #define INITIAL_SCR_WIDTH 1000
 #define INITIAL_SCR_HEIGHT 500
@@ -37,11 +38,11 @@ class State {
 
         Renderer* renderer;
         Window* window;
-        std::vector<Camera*> cameras; // cameras[0] is the main camera
+        std::vector<Entity*> entities; // entities[0] is the player
         std::vector<Shader*> shaderPrograms;
         Texture2D* textures2D[MAX_TEXTURE_UNITS];
 
-        uint8_t activeCameraIndex = 0;
+        uint8_t activePlayerIndex = 0;
         uint8_t activeShaderIndex = 0;
 
         int init();

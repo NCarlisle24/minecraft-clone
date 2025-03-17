@@ -31,29 +31,37 @@ void State::processCameraMovement() {
     // std::cout << "Camera position: (" << camera->position.x << ", " << camera->position.y << ", " << camera->position.z << ")" << std::endl;
     // std::cout << "Camera direction angles: (" << camera->getDirectionAngles().x << ", " << camera->getDirectionAngles().y
     //           << ", " << camera->getDirectionAngles().z << ")" << std::endl;
-    // std::cout << "Camera direction: (" << camera->getDirectionVector().x << ", " << camera->getDirectionVector().y
-    //           << ", " << camera->getDirectionVector().z << ")" << std::endl;
 
-    Camera* camera = cameras[activeCameraIndex];
+    Player* player = (Player*)entities[activePlayerIndex];
+
+    // std::cout << "Camera direction: (" << player->camera->getDirection().x << ", " << player->camera->getDirection().y
+    //           << ", " << player->camera->getDirection().z << "), Angles: (" << player->camera->getDirectionAngles().x 
+    //           << ", " << player->camera->getDirectionAngles().y << ", " << player->camera->getDirectionAngles().z 
+    //           << ")" << std::endl;
+
+    // std::cout << "Player direction: (" << player->getDirection().x << ", " << player->getDirection().y
+    //           << ", " << player->getDirection().z << "), Angles: (" << player->getDirectionAngles().x 
+    //           << ", " << player->getDirectionAngles().y << ", " << player->getDirectionAngles().z 
+    //           << ")" << std::endl;
 
     glm::vec3 horizontalMovementVector = zeroVec3;
 
     if (window->isPressed(GLFW_KEY_W)) {
-        horizontalMovementVector += camera->getHorizontalDirectionVector();
+        horizontalMovementVector += player->getHorizontalDirection();
     }
     if (window->isPressed(GLFW_KEY_S)) {
-        horizontalMovementVector -= camera->getHorizontalDirectionVector();
+        horizontalMovementVector -= player->getHorizontalDirection();
     }
     if (window->isPressed(GLFW_KEY_D)) {
-        horizontalMovementVector += camera->right;
+        horizontalMovementVector += player->getRightDirection();
     }
     if (window->isPressed(GLFW_KEY_A)) {
-        horizontalMovementVector -= camera->right;
+        horizontalMovementVector -= player->getRightDirection();
     }
 
     if (horizontalMovementVector != zeroVec3) {
         horizontalMovementVector = glm::normalize(horizontalMovementVector);
-        camera->move(camera->horizontalMovementSpeed * State::deltaTime * horizontalMovementVector);
+        player->move(player->horizontalMovementSpeed * State::deltaTime * horizontalMovementVector);
     }
 
     glm::vec3 verticalMovementVector = zeroVec3;
@@ -66,7 +74,7 @@ void State::processCameraMovement() {
     }
 
     if (verticalMovementVector != zeroVec3) {
-        camera->move(camera->verticalMovementSpeed * State::deltaTime * verticalMovementVector);
+        player->move(player->verticalMovementSpeed * State::deltaTime * verticalMovementVector);
     }
 }
 
@@ -92,8 +100,8 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     state->windowHeight = height;
     state->aspectRatio = (float) width / (float) height;
 
-    for (int i = 0; i < state->cameras.size(); i++) {
-        state->cameras[i]->updateProjectionMatrix(state->aspectRatio);
+    for (int i = 0; i < state->entities.size(); i++) {
+        state->entities[i]->camera->updateProjectionMatrix(state->aspectRatio);
     }
 }
 
@@ -106,14 +114,12 @@ void mousePositionCallback(GLFWwindow* window, double newMouseX, double newMouse
         state->firstMouseFocus = false;
     }
 
-    Camera* camera = state->cameras[state->activeCameraIndex];
+    Player* player = (Player*)(state->entities[state->activePlayerIndex]);
 
     glm::vec3 mouseDelta = glm::vec3(newMouseX - state->mouseX, state->mouseY - newMouseY, 0.0f);
     
-    if (camera != NULL) {
-        mouseDelta *= camera->mouseSensitivity;
-        camera->rotateDirection(mouseDelta);
-    }
+    mouseDelta *= player->mouseCameraSensitivity;
+    player->rotateDirection(mouseDelta);
 
     state->mouseX = newMouseX;
     state->mouseY = newMouseY;
@@ -158,7 +164,7 @@ void State::update() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderer->render(window, cameras[activeCameraIndex], shaderPrograms[activeShaderIndex]);
+    renderer->render(window, entities[activePlayerIndex], shaderPrograms[activeShaderIndex]);
 
     window->swapBuffers();
 
@@ -167,11 +173,7 @@ void State::update() {
 }
 
 void State::processInput() {
-    Camera* camera = cameras[activeCameraIndex];
-
-    if (camera != NULL) {
-        processCameraMovement();
-    }
+    processCameraMovement();
 }
 
 void State::enableCapabilities() {
