@@ -7,6 +7,7 @@
 #include <utils/window.hpp>
 #include <utils/block.hpp>
 #include <utils/texture.hpp>
+#include <entities.hpp>
 
 #define BUFFER_SIZE 5e8 // 500 MB
 
@@ -21,7 +22,7 @@ class Renderer {
         Renderer();
         ~Renderer();
 
-        void render(Window* const &window, Camera* const &camera, Shader* const &shader);
+        void render(Window* const &window, Entity* const &entity, Shader* const &shader);
 };
 
 #endif

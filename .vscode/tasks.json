@@ -4,7 +4,7 @@
 		{
 			"type": "cppbuild",
 			"label": "C/C++: g++.exe build active file",
-			"command": "C:\\Program Files\\mingw64\\bin\\g++.exe",
+			"command": "C:\\Users\\nlc282\\mingw64\\bin\\g++.exe",
 			"args": [
 				"-fdiagnostics-color=always",
 				"-std=c++17",
@@ -19,6 +19,8 @@
 				"${workspaceFolder}/src/block.cpp",
 				"${workspaceFolder}/src/renderer.cpp",
 				"${workspaceFolder}/src/state.cpp",
+				"${workspaceFolder}/src/entities/entity.cpp",
+				"${workspaceFolder}/src/entities/player.cpp",
 				"${workspaceFolder}/src/main.cpp",
 				"-lglfw3dll",
 				"-o",
