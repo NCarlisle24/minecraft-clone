@@ -1,17 +1,9 @@
-#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION // only do ONCE in the entire project
+#include "../internal/main-utils.hpp"
 
-#include <utils/helper.hpp>
-#include <utils/window.hpp>
-#include <utils/shader.hpp>
-#include <utils/texture.hpp>
-#include <utils/camera.hpp>
-#include <utils/block.hpp>
-#include <utils/renderer.hpp>
-#include <utils/state.hpp>
-#include <entities.hpp>
-
-#define BASE_VERT_FILE_PATH "src/shaders/base.vert"
-#define BASE_FRAG_FILE_PATH "src/shaders/base.frag"
+#define BASE_VERT_FILE_PATH "/assets/shaders/base.vert"
+#define BASE_FRAG_FILE_PATH "/assets/shaders/base.frag"
+#define TEXTURE_ATLAS_FILE_PATH "/assets/textures/wall.jpg"
 
 State* state;
 
@@ -42,7 +34,7 @@ int main() {
     /* ======================================= textures ======================================= */
 
     setActiveTextureUnit(0);
-    Texture2D* textureAtlas = new Texture2D("./src/textures/wall.jpg");
+    Texture2D* textureAtlas = new Texture2D(TEXTURE_ATLAS_FILE_PATH, GL_RGB);
 
     state->textures2D[0] = textureAtlas;
 
@@ -65,7 +57,9 @@ int main() {
         state->update();
     }
 
-    std::cout << "FPS: " << state->fps << std::endl;
+    std::cout << "FPS at closing time: " << state->fps << std::endl;
+
+    /* ====================================== cleanup ====================================== */
 
     delete baseShader;
     delete textureAtlas;

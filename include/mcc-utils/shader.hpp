@@ -1,7 +1,7 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#include <utils/helper.hpp>
+#include <mcc-utils/helper.hpp>
 
 #define INFO_LOG_LENGTH 512
 

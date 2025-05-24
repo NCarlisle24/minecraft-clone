@@ -1,13 +1,12 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include <utils/helper.hpp>
-#include <utils/camera.hpp>
-#include <utils/shader.hpp>
-#include <utils/window.hpp>
-#include <utils/block.hpp>
-#include <utils/texture.hpp>
-#include <entities.hpp>
+#include <mcc-utils/helper.hpp>
+#include <mcc-utils/camera.hpp>
+#include <mcc-utils/shader.hpp>
+#include <mcc-utils/window.hpp>
+#include <mcc-utils/block.hpp>
+#include <mcc-utils/texture.hpp>
 
 #define BUFFER_SIZE 5e8 // 500 MB
 
@@ -22,7 +21,7 @@ class Renderer {
         Renderer();
         ~Renderer();
 
-        void render(Window* const &window, Entity* const &entity, Shader* const &shader);
+        void render(Window* const &window, Camera* const &camera, Shader* const &shader);
 };
 
 #endif

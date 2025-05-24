@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include <utils/helper.hpp>
+#include <mcc-utils/helper.hpp>
 
 #define DEFAULT_DEGREE_FOV 70.0f
 #define DEFAULT_NEAR_PLANE 0.1f

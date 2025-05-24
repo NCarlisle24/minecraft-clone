@@ -1,7 +1,7 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#include <utils/helper.hpp>
+#include <mcc-utils/helper.hpp>
 
 #define DEFAULT_SCR_WIDTH 800
 #define DEFAULT_SCR_HEIGHT 600

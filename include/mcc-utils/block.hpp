@@ -1,7 +1,7 @@
 #ifndef BLOCK_HPP
 #define BLOCK_HPP
 
-#include <utils/helper.hpp>
+#include <mcc-utils/helper.hpp>
 
 #define CHUNK_SIZE 32
 #define WORLD_HEIGHT 256

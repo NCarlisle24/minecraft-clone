@@ -1,11 +1,12 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
-#include <utils/helper.hpp>
-#include <utils/renderer.hpp> // includes window, camera, and shader
-#include <utils/texture.hpp>
-#include <utils/block.hpp>
-#include <entities.hpp>
+#include <mcc-utils/helper.hpp>
+#include <mcc-utils/renderer.hpp> // includes window, camera, and shader
+#include <mcc-utils/texture.hpp>
+#include <mcc-utils/block.hpp>
+#include <mcc-utils/entities/entity.hpp>
+#include <mcc-utils/entities/player.hpp>
 
 #define INITIAL_SCR_WIDTH 1000
 #define INITIAL_SCR_HEIGHT 500

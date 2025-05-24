@@ -24,7 +24,7 @@
 #define SUCCESS 0
 #define ERROR -1
 
-extern const glm::mat4 identityMat4;
+extern const glm::mat4 identityMat4; // self-explanatory
 
 extern const glm::vec3 zeroVec3; // (0.0f, 0.0f, 0.0f)
 extern const glm::vec3 upVec3; // (0.0f, 1.0f, 0.0f)

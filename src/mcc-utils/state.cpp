@@ -1,4 +1,4 @@
-#include <utils/state.hpp>
+#include <mcc-utils/state.hpp>
 
 bool glfwIsInitialized = false;
 
@@ -23,7 +23,7 @@ int setupGLFW() {
     return SUCCESS;
 }
 
-void defaultGlfwErrorCallback(int error, const char* msg) {
+static void defaultGlfwErrorCallback(int error, const char* msg) {
     std::cerr << "[" << error << "] " << msg << std::endl;
 }
 
@@ -78,7 +78,7 @@ void State::processCameraMovement() {
     }
 }
 
-void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+static void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         switch (key) {
             case GLFW_KEY_F:
@@ -91,7 +91,7 @@ void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action
     }
 }
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 
     State* state = (State*)glfwGetWindowUserPointer(window);
@@ -105,7 +105,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     }
 }
 
-void mousePositionCallback(GLFWwindow* window, double newMouseX, double newMouseY) {
+static void mousePositionCallback(GLFWwindow* window, double newMouseX, double newMouseY) {
     State* state = (State*)glfwGetWindowUserPointer(window);
 
     if (state->firstMouseFocus) {
@@ -164,7 +164,7 @@ void State::update() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderer->render(window, entities[activePlayerIndex], shaderPrograms[activeShaderIndex]);
+    renderer->render(window, entities[activePlayerIndex]->camera, shaderPrograms[activeShaderIndex]);
 
     window->swapBuffers();
 

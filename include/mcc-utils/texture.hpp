@@ -1,10 +1,11 @@
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
 
-#include <utils/helper.hpp>
+#include <mcc-utils/helper.hpp>
 
 #define MAX_TEXTURE_UNITS 32
 #define NO_TEXTURE_UNIT -1
+#define COLOR_FORMAT_ERROR 0xDEADBEEF
 
 typedef enum {
     NORMAL,

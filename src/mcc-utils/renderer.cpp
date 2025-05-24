@@ -1,4 +1,4 @@
-#include <utils/renderer.hpp>
+#include <mcc-utils/renderer.hpp>
 
 const float testData[] = {
     0.0f, 0.0f, 0.0f,
@@ -63,14 +63,14 @@ Renderer::~Renderer() {
     glDeleteBuffers(1, &EBO);
 }
 
-void Renderer::render(Window* const &window, Entity* const &entity, Shader* const &shader) {
+void Renderer::render(Window* const &window, Camera* const &camera, Shader* const &shader) {
     window->setAsContext();
     glBindVertexArray(VAO);
     shader->use();
 
     // load matrix uniforms
-    shader->setUniformMat4("view", entity->camera->viewMatrix);
-    shader->setUniformMat4("projection", entity->camera->projectionMatrix);
+    shader->setUniformMat4("view", camera->viewMatrix);
+    shader->setUniformMat4("projection", camera->projectionMatrix);
 
     // load TBO data
     setActiveTextureUnit(0);

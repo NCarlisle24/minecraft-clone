@@ -1,8 +1,8 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
-#include <utils/helper.hpp>
-#include <utils/camera.hpp>
+#include <mcc-utils/helper.hpp>
+#include <mcc-utils/camera.hpp>
 
 class Entity {
     public:

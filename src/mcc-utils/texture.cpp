@@ -1,9 +1,9 @@
-#include <utils/texture.hpp>
+#include <mcc-utils/texture.hpp>
 
 GLenum getColorFormat(const char* fileName) {
     char* extension = getFileExtension(fileName);
 
-    if (extension == NULL) return ERROR;
+    if (extension == NULL) return COLOR_FORMAT_ERROR;
 
     if (strcmp(extension, "png") == 0) {
         free(extension);
