@@ -1,15 +1,15 @@
 #define STB_IMAGE_IMPLEMENTATION // only do ONCE in the entire project
 #include "../internal/main-utils.hpp"
 
-#define BASE_VERT_FILE_PATH "/assets/shaders/base.vert"
-#define BASE_FRAG_FILE_PATH "/assets/shaders/base.frag"
-#define TEXTURE_ATLAS_FILE_PATH "/assets/textures/wall.jpg"
+#define BASE_VERT_FILE_PATH "./assets/shaders/base.vert"
+#define BASE_FRAG_FILE_PATH "./assets/shaders/base.frag"
+#define TEXTURE_ATLAS_FILE_PATH "./assets/textures/wall.jpg"
 
 State* state;
 
 int main() {
     /* ======================================= setup ======================================= */
-    
+
     if (setupGLFW() == ERROR) {
         std::cerr << "Error: Failed to initialize GLFW." << std::endl;
         return 1;
@@ -34,7 +34,7 @@ int main() {
     /* ======================================= textures ======================================= */
 
     setActiveTextureUnit(0);
-    Texture2D* textureAtlas = new Texture2D(TEXTURE_ATLAS_FILE_PATH, GL_RGB);
+    Texture2D* textureAtlas = new Texture2D(TEXTURE_ATLAS_FILE_PATH);
 
     state->textures2D[0] = textureAtlas;
 
@@ -57,9 +57,7 @@ int main() {
         state->update();
     }
 
-    std::cout << "FPS at closing time: " << state->fps << std::endl;
-
-    /* ====================================== cleanup ====================================== */
+    std::cout << "FPS: " << state->fps << std::endl;
 
     delete baseShader;
     delete textureAtlas;

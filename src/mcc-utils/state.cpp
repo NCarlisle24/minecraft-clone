@@ -23,7 +23,7 @@ int setupGLFW() {
     return SUCCESS;
 }
 
-static void defaultGlfwErrorCallback(int error, const char* msg) {
+void defaultGlfwErrorCallback(int error, const char* msg) {
     std::cerr << "[" << error << "] " << msg << std::endl;
 }
 
@@ -78,7 +78,7 @@ void State::processCameraMovement() {
     }
 }
 
-static void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         switch (key) {
             case GLFW_KEY_F:
@@ -91,7 +91,7 @@ static void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int
     }
 }
 
-static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 
     State* state = (State*)glfwGetWindowUserPointer(window);
@@ -105,7 +105,7 @@ static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     }
 }
 
-static void mousePositionCallback(GLFWwindow* window, double newMouseX, double newMouseY) {
+void mousePositionCallback(GLFWwindow* window, double newMouseX, double newMouseY) {
     State* state = (State*)glfwGetWindowUserPointer(window);
 
     if (state->firstMouseFocus) {

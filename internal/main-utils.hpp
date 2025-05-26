@@ -1,5 +1,5 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef MAIN_UTILS_HPP
+#define MAIN_UTILS_HPP
 
 #include <mcc-utils/helper.hpp>
 #include <mcc-utils/window.hpp>
@@ -9,6 +9,7 @@
 #include <mcc-utils/block.hpp>
 #include <mcc-utils/renderer.hpp>
 #include <mcc-utils/state.hpp>
+
 #include <mcc-utils/entities/player.hpp>
 
 #endif
