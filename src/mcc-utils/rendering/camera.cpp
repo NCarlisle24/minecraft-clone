@@ -1,4 +1,4 @@
-#include <mcc-utils/camera.hpp>
+#include <mcc-utils/rendering/camera.hpp>
 
 Camera::Camera(const float &aspectRatio) {
     updateTranslationViewMatrix();

@@ -57,7 +57,7 @@ int main() {
         state->update();
     }
 
-    std::cout << "FPS: " << state->fps << std::endl;
+    std::cout << "FPS at closing time: " << state->fps << std::endl;
 
     delete baseShader;
     delete textureAtlas;

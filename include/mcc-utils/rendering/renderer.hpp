@@ -2,11 +2,11 @@
 #define RENDERER_HPP
 
 #include <mcc-utils/helper.hpp>
-#include <mcc-utils/camera.hpp>
-#include <mcc-utils/shader.hpp>
-#include <mcc-utils/window.hpp>
-#include <mcc-utils/block.hpp>
-#include <mcc-utils/texture.hpp>
+#include <mcc-utils/rendering/camera.hpp>
+#include <mcc-utils/rendering/shader.hpp>
+#include <mcc-utils/rendering/window.hpp>
+#include <mcc-utils/world/block.hpp>
+#include <mcc-utils/rendering/texture.hpp>
 
 #define BUFFER_SIZE 5e8 // 500 MB
 

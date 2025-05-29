@@ -19,6 +19,7 @@ typedef enum {
     NEG_Z,
     NO_DIRECTION
 } AxisDirection;
+
 typedef struct {
     float x, y, z;
     float u, v;

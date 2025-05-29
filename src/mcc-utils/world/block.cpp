@@ -1,4 +1,4 @@
-#include <mcc-utils/block.hpp>
+#include <mcc-utils/world/block.hpp>
 
 const BlockVertex blockVertices[BLOCK_VERTICES_LENGTH] = {
     // front face

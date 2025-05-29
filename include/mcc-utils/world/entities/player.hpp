@@ -2,7 +2,7 @@
 #define PLAYER_HPP
 
 #include <mcc-utils/helper.hpp>
-#include <mcc-utils/entities/entity.hpp>
+#include <mcc-utils/world/entities/entity.hpp>
 
 #define DEFAULT_PLAYER_HORIZONTAL_MOVEMENT_SPEED 5.0f
 #define DEFAULT_PLAYER_VERTICAL_MOVEMENT_SPEED 5.0f

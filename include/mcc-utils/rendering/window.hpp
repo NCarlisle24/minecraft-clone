@@ -3,10 +3,11 @@
 
 #include <mcc-utils/helper.hpp>
 
-#define DEFAULT_SCR_WIDTH 800
-#define DEFAULT_SCR_HEIGHT 600
+#define DEFAULT_SCR_WIDTH 1000
+#define DEFAULT_SCR_HEIGHT 800
 
-static void defaultFrameBufferSizeCallback(GLFWwindow* window, int width, int height);
+#define DEFAULT_WINDOW_TITLE "MCC Window"
+
 class Window {
     public:
         GLFWwindow* glfwWindow;
@@ -14,7 +15,7 @@ class Window {
         bool firstMouseFocus = true;
 
         Window(const int &width = DEFAULT_SCR_WIDTH, const int &height = DEFAULT_SCR_HEIGHT,
-               const char* title = "(default title)");
+               const char* title = DEFAULT_WINDOW_TITLE);
         ~Window();
         
         int setAsContext();

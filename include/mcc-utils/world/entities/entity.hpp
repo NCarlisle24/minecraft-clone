@@ -2,7 +2,7 @@
 #define ENTITY_HPP
 
 #include <mcc-utils/helper.hpp>
-#include <mcc-utils/camera.hpp>
+#include <mcc-utils/rendering/camera.hpp>
 
 class Entity {
     public:

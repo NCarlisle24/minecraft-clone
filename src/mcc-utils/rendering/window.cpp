@@ -1,5 +1,6 @@
-#include <mcc-utils/window.hpp>
+#include <mcc-utils/rendering/window.hpp>
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 static void defaultFrameBufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }

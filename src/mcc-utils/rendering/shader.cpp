@@ -1,4 +1,4 @@
-#include <mcc-utils/shader.hpp>
+#include <mcc-utils/rendering/shader.hpp>
 
 unsigned int createShader(const char* fileName, const GLenum &shaderType) {
     int success;

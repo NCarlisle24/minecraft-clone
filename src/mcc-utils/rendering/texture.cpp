@@ -1,4 +1,4 @@
-#include <mcc-utils/texture.hpp>
+#include <mcc-utils/rendering/texture.hpp>
 
 GLenum getColorFormat(const char* fileName) {
     char* extension = getFileExtension(fileName);

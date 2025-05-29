@@ -22,7 +22,7 @@
 #include <ext/glm/gtc/type_ptr.hpp>
 
 #define SUCCESS 0
-#define ERROR -1
+#define ERROR 0xDEADBEEF
 
 extern const glm::mat4 identityMat4; // self-explanatory
 

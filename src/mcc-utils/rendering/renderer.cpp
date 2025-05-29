@@ -1,4 +1,4 @@
-#include <mcc-utils/renderer.hpp>
+#include <mcc-utils/rendering/renderer.hpp>
 
 const float testData[] = {
     0.0f, 0.0f, 0.0f,

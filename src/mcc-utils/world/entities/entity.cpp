@@ -1,4 +1,4 @@
-#include <mcc-utils/entities/entity.hpp>
+#include <mcc-utils/world/entities/entity.hpp>
 
 Entity::Entity(Camera* const &camera) {
     this->camera = camera;
