@@ -80,6 +80,7 @@ void State::processCameraMovement() {
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 static void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    State* state = (State*)glfwGetWindowUserPointer(window);
     if (action == GLFW_PRESS) {
         switch (key) {
             case GLFW_KEY_F:
@@ -87,6 +88,10 @@ static void keyboardInputCallback(GLFWwindow* window, int key, int scancode, int
                 break;
             case GLFW_KEY_ESCAPE:
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
+                break;
+            case GLFW_KEY_P:
+                const glm::vec3 &position = state->entities[state->activePlayerIndex]->getPosition();
+                std::cerr << "Player position: (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
                 break;
         }
     }
@@ -154,6 +159,20 @@ unsigned int State::init() {
 
     window->setUserPointer(this);
 
+    // initialize random seed
+    srand(static_cast<unsigned int>(time(NULL)));
+
+    // generate chunks
+    numChunks = renderDistance * renderDistance;
+    chunks = new Chunk[numChunks];
+
+    for (int i = 0; i < numChunks; i++) {
+        chunks[i].x = (i % renderDistance) * CHUNK_SIZE;
+        chunks[i].z = (i / renderDistance) * CHUNK_SIZE;
+    }
+
+    generateChunks(chunks, renderDistance, 10.0f);
+
     return SUCCESS;
 }
 
@@ -165,7 +184,7 @@ void State::update() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderer->render(window, entities[activePlayerIndex]->camera, shaderPrograms[activeShaderIndex]);
+    renderer->render(window, shaderPrograms[activeShaderIndex], entities[activePlayerIndex]->camera, chunks, numChunks);
 
     window->swapBuffers();
 

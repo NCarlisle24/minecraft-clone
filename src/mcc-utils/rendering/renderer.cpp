@@ -1,12 +1,5 @@
 #include <mcc-utils/rendering/renderer.hpp>
 
-const float testData[] = {
-    0.0f, 0.0f, 0.0f,
-    1.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f
-};
-
 void toggleWireframeMode() {
     int polygonMode;
     glGetIntegerv(GL_POLYGON_MODE, &polygonMode);
@@ -63,7 +56,8 @@ Renderer::~Renderer() {
     glDeleteBuffers(1, &EBO);
 }
 
-void Renderer::render(Window* const &window, Camera* const &camera, Shader* const &shader) {
+void Renderer::render(Window* const &window, Shader* const &shader, Camera* const &camera,
+                      const Chunk* const &chunks, const int &numChunks) {
     window->setAsContext();
     glBindVertexArray(VAO);
     shader->use();
@@ -73,12 +67,34 @@ void Renderer::render(Window* const &window, Camera* const &camera, Shader* cons
     shader->setUniformMat4("projection", camera->projectionMatrix);
 
     // load TBO data
+    // TODO: set position data to an initial size to avoid overhead
+    std::vector<float> positionData;
+    
+    for (int chunkIndex = 0; chunkIndex < numChunks; chunkIndex++) {
+        const Chunk& chunk = chunks[chunkIndex];
+
+        for (int y = 0; y < WORLD_HEIGHT; y++) {
+            for (int z = 0; z < CHUNK_SIZE; z++) {
+                for (int x = 0; x < CHUNK_SIZE; x++) {
+                    const Block& block = chunk.blockData[getBlockIndex(x, y, z)];
+                    if (block.id == AIR) continue; // skip air
+                    positionData.push_back(static_cast<float>(chunk.x + x));
+                    positionData.push_back(static_cast<float>(y));
+                    positionData.push_back(static_cast<float>(chunk.z + z));
+
+                    // std::cerr << "Adding block at (" << chunk.x + x << ", " << y << ", " << chunk.z + z << ")" << std::endl;
+                }
+            }
+        }
+    }
+
     setActiveTextureUnit(0);
 
     unsigned int blockPositionsBuffer;
     glGenBuffers(1, &blockPositionsBuffer);
     glBindBuffer(GL_TEXTURE_BUFFER, blockPositionsBuffer);
-    glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * 12, testData, GL_DYNAMIC_DRAW);
+
+    glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * positionData.size(), positionData.data(), GL_DYNAMIC_DRAW);
 
     glBindTexture(GL_TEXTURE_BUFFER, blockPositionsTexture);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, blockPositionsBuffer);
@@ -93,5 +109,5 @@ void Renderer::render(Window* const &window, Camera* const &camera, Shader* cons
     // std::cout << std::endl;
 
     // draw stuff
-    glDrawElementsInstanced(GL_TRIANGLES, BLOCK_INDICES_LENGTH, GL_UNSIGNED_INT, (void*)0, 4);
+    glDrawElementsInstanced(GL_TRIANGLES, BLOCK_INDICES_LENGTH, GL_UNSIGNED_INT, (void*)0, positionData.size() / 3);
 }

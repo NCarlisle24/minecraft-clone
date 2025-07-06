@@ -8,8 +8,6 @@
 #include <mcc-utils/world/block.hpp>
 #include <mcc-utils/rendering/texture.hpp>
 
-#define BUFFER_SIZE 5e8 // 500 MB
-
 void toggleWireframeMode();
 class Renderer {
     public:
@@ -21,7 +19,8 @@ class Renderer {
         Renderer();
         ~Renderer();
 
-        void render(Window* const &window, Camera* const &camera, Shader* const &shader);
+        void render(Window* const &window, Shader* const &shader, Camera* const &camera,
+                    const Chunk* const &chunks, const int &numChunks);
 };
 
 #endif

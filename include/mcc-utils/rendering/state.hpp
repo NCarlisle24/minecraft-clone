@@ -7,6 +7,7 @@
 #include <mcc-utils/world/block.hpp>
 #include <mcc-utils/world/entities/entity.hpp>
 #include <mcc-utils/world/entities/player.hpp>
+#include <mcc-utils/math/noise.hpp>
 
 #define INITIAL_SCR_WIDTH 1000
 #define INITIAL_SCR_HEIGHT 500
@@ -39,6 +40,7 @@ class State {
         Texture2D* textures2D[MAX_TEXTURE_UNITS];
 
         Chunk* chunks;
+        size_t numChunks = 0;
 
         uint8_t activePlayerIndex = 0;
         uint8_t activeShaderIndex = 0;
