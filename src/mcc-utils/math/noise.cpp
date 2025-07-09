@@ -22,51 +22,55 @@ void generateChunks(Chunk* const &chunks, const int &areaChunkLength, const floa
         cornerGradients[i] = generateRandom2dUnitVector();
     }
 
-    float dotProducts[4];
+    float dotProduct00, dotProduct10, dotProduct01, dotProduct11;
     int cornerIndices[4] = {0, 1, areaChunkLength + 1, areaChunkLength + 2};
-    float interpolatedX1, interpolatedX2;
+    float interpolatedX1, interpolatedX2, noiseValue;
     int finalValue;
 
     for (int chunkIndex = 0; chunkIndex < numChunks; chunkIndex++) {
+        // std::cerr << "Corner gradients for chunk " << chunkIndex << ": ";
+        // std::cerr << "(" << cornerGradients[cornerIndices[0]].x << ", " << cornerGradients[cornerIndices[0]].y << ") | ";
+        // std::cerr << "(" << cornerGradients[cornerIndices[1]].x << ", " << cornerGradients[cornerIndices[1]].y << ") | ";
+        // std::cerr << "(" << cornerGradients[cornerIndices[2]].x << ", " << cornerGradients[cornerIndices[2]].y << ") | ";
+        // std::cerr << "(" << cornerGradients[cornerIndices[3]].x << ", " << cornerGradients[cornerIndices[3]].y << ")";
+        // std::cerr << std::endl;
+
+        // std::cerr << "Chunk " << chunkIndex << " using corner indices: "
+        //           << cornerIndices[0] << ", "
+        //           << cornerIndices[1] << ", "
+        //           << cornerIndices[2] << ", "
+        //           << cornerIndices[3] << ", "
+        //           << std::endl;
+
+        
         for (int z = 0; z < CHUNK_SIZE; z++) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
+                // only the first corner can have an offset of (0, 0), so check for that
                 if (x == 0 && z == 0) {
-                    dotProducts[0] = 0.0f;
+                    dotProduct00 = 0.0f;
                 } else {
-                    dotProducts[0] = glm::dot(cornerGradients[cornerIndices[0]], glm::normalize(glm::vec2(x, z)));
-                }
-                
-                if (x == CHUNK_SIZE - 1 && z == 0) {
-                    dotProducts[1] = 0.0f;
-                } else {
-                    dotProducts[1] = glm::dot(cornerGradients[cornerIndices[1]], glm::normalize(glm::vec2(x - (CHUNK_SIZE - 1), z)));
+                    dotProduct00 = glm::dot(cornerGradients[cornerIndices[0]], glm::vec2(x, z));
                 }
 
-                if (x == 0 && z == CHUNK_SIZE - 1) {
-                    dotProducts[2] = 0.0f;
-                } else {
-                    dotProducts[2] = glm::dot(cornerGradients[cornerIndices[2]], glm::normalize(glm::vec2(x, z - (CHUNK_SIZE - 1))));
-                }
-
-                if (x == CHUNK_SIZE - 1 && z == CHUNK_SIZE - 1) {
-                    dotProducts[3] = 0.0f;
-                } else {
-                    dotProducts[3] = glm::dot(cornerGradients[cornerIndices[3]], glm::normalize(glm::vec2(x - (CHUNK_SIZE - 1), z - (CHUNK_SIZE - 1))));
-                }
-
-                // move dot products to range [0, 1]
-                // TODO: this is erroneous because we need to move the range of the final value, not the dot products
-                // need to map y=0 to "middle" of the chunk, where y=CHUNK_HEIGHT/2 is top/bottom
-                for (auto &dotProduct : dotProducts) {
-                    dotProduct = (dotProduct + 1.0f) * 0.5f;
-                }
+                dotProduct10 = glm::dot(cornerGradients[cornerIndices[1]], glm::vec2(x - CHUNK_SIZE, z));
+                dotProduct01 = glm::dot(cornerGradients[cornerIndices[2]], glm::vec2(x, z - CHUNK_SIZE));
+                dotProduct11 = glm::dot(cornerGradients[cornerIndices[3]], glm::vec2(x - CHUNK_SIZE, z - CHUNK_SIZE));
 
                 // TODO: use smooth step function for interpolation (linear for now)
-                interpolatedX1 = ((CHUNK_SIZE - x) * dotProducts[0] + x * dotProducts[1]) / CHUNK_SIZE;
-                interpolatedX2 = ((CHUNK_SIZE - x) * dotProducts[2] + x * dotProducts[3]) / CHUNK_SIZE;
-                finalValue = static_cast<int>(scale * ((CHUNK_SIZE - z) * interpolatedX1 + z * interpolatedX2) / CHUNK_SIZE);
-                
+                interpolatedX1 = ((CHUNK_SIZE - x) * dotProduct00 + x * dotProduct10) / CHUNK_SIZE;
+                interpolatedX2 = ((CHUNK_SIZE - x) * dotProduct01 + x * dotProduct11) / CHUNK_SIZE;
+
+                noiseValue = ((CHUNK_SIZE - z) * interpolatedX1 + z * interpolatedX2) / CHUNK_SIZE;
+                // normalize to [-1, 1]
+                noiseValue /= CHUNK_SIZE;
+                noiseValue *= glm::root_two<float>(); // divide by sqrt(0.5) => multiply by sqrt(2)
+
+                finalValue = static_cast<int>(noiseValue * scale);
+                finalValue += WORLD_HEIGHT / 2;
+
                 // std::cerr << "Chunk = " << chunkIndex << ", pos = (" << x << ", " << finalValue << ", " << z << ")," << "block index = " << getBlockIndex(x, finalValue, z) << std::endl;
+
+                // if finalValue is out of bounds (ie scale is too large), we get a seg fault
                 
                 chunks[chunkIndex].blockData[getBlockIndex(x, finalValue, z)] = {
                     .id = DIRT,

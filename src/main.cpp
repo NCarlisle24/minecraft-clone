@@ -49,6 +49,8 @@ int main() {
     state->entities.push_back(mainPlayer);
     state->entities.push_back(debugPlayer);
 
+    mainPlayer->setPosition(glm::vec3(0.0f, static_cast<float>(WORLD_HEIGHT / 2), 0.0f));
+
     /* ======================================= main loop ======================================= */
 
     glfwSwapInterval(0); // disable vsync

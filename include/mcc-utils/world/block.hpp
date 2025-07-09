@@ -3,7 +3,7 @@
 
 #include <mcc-utils/helper.hpp>
 
-#define CHUNK_SIZE 32
+#define CHUNK_SIZE 16
 #define WORLD_HEIGHT 256
 
 #define BLOCK_VERTICES_LENGTH 24
