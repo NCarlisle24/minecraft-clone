@@ -15,12 +15,12 @@ class Renderer {
         unsigned int VBO = 0; // vertex buffer object
         unsigned int EBO = 0; // element buffer object
         unsigned int blockPositionsTexture = 0; // texture buffer object (alternative to SSBOs)
+        unsigned int numInstances = 0;
 
-        Renderer();
+        Renderer(const Chunk* const &chunks, const int &numChunks);
         ~Renderer();
 
-        void render(Window* const &window, Shader* const &shader, Camera* const &camera,
-                    const Chunk* const &chunks, const int &numChunks);
+        void render(Window* const &window, Shader* const &shader, Camera* const &camera);
 };
 
 #endif

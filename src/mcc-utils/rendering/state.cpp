@@ -147,8 +147,6 @@ unsigned int State::init() {
         return ERROR;
     }
 
-    renderer = new Renderer();
-
     window->setAsContext();
     enableCapabilities();
 
@@ -173,6 +171,8 @@ unsigned int State::init() {
 
     generateChunks(chunks, renderDistance, 10.0f);
 
+    renderer = new Renderer(chunks, numChunks);
+
     return SUCCESS;
 }
 
@@ -184,7 +184,7 @@ void State::update() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderer->render(window, shaderPrograms[activeShaderIndex], entities[activePlayerIndex]->camera, chunks, numChunks);
+    renderer->render(window, shaderPrograms[activeShaderIndex], entities[activePlayerIndex]->camera);
 
     window->swapBuffers();
 

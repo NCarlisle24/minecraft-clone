@@ -53,7 +53,7 @@ int main() {
 
     /* ======================================= main loop ======================================= */
 
-    glfwSwapInterval(0); // disable vsync
+    // glfwSwapInterval(0); // disable vsync
 
     while (!(state->window->shouldClose())) {
         state->update();

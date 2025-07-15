@@ -4,7 +4,8 @@ layout (location = 0) in vec3 Position;
 layout (location = 1) in vec2 TexCoord;
 layout (location = 2) in uint FaceDirection;
 
-out vec2 inTexCoord;
+out vec2 fragTexCoord;
+flat out uint fragFaceDirection;
 
 uniform mat4 view;
 uniform mat4 projection;
@@ -17,5 +18,6 @@ void main() {
     vec3 worldPosition = Position + blockPosition;
     gl_Position = projection * view * vec4(worldPosition, 1.0f);
 
-    inTexCoord = TexCoord;
+    fragTexCoord = TexCoord;
+    fragFaceDirection = FaceDirection;
 }

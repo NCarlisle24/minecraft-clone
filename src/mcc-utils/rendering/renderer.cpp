@@ -11,7 +11,7 @@ void toggleWireframeMode() {
     }
 }
 
-Renderer::Renderer() {
+Renderer::Renderer(const Chunk* const &chunks, const int &numChunks) {
     if (glfwGetCurrentContext() == NULL) {
         std::cerr << "Error: No current OpenGL context." << std::endl;
         return;
@@ -46,26 +46,6 @@ Renderer::Renderer() {
     glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, stride, (void*)(sizeof(float) * 5)); // face index
     glEnableVertexAttribArray(2);
 
-    glBindVertexArray(0);
-}
-
-Renderer::~Renderer() {
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &blockPositionsTexture);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-}
-
-void Renderer::render(Window* const &window, Shader* const &shader, Camera* const &camera,
-                      const Chunk* const &chunks, const int &numChunks) {
-    window->setAsContext();
-    glBindVertexArray(VAO);
-    shader->use();
-
-    // load matrix uniforms
-    shader->setUniformMat4("view", camera->viewMatrix);
-    shader->setUniformMat4("projection", camera->projectionMatrix);
-
     // load TBO data
     // TODO: set position data to an initial size to avoid overhead
     std::vector<float> positionData;
@@ -88,6 +68,8 @@ void Renderer::render(Window* const &window, Shader* const &shader, Camera* cons
         }
     }
 
+    numInstances = positionData.size() / 3;
+
     setActiveTextureUnit(0);
 
     unsigned int blockPositionsBuffer;
@@ -99,6 +81,24 @@ void Renderer::render(Window* const &window, Shader* const &shader, Camera* cons
     glBindTexture(GL_TEXTURE_BUFFER, blockPositionsTexture);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, blockPositionsBuffer);
 
+    glBindVertexArray(0);
+}
+
+Renderer::~Renderer() {
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &blockPositionsTexture);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+void Renderer::render(Window* const &window, Shader* const &shader, Camera* const &camera) {
+    window->setAsContext();
+    glBindVertexArray(VAO);
+    shader->use();
+
+    // load matrix uniforms
+    shader->setUniformMat4("view", camera->viewMatrix);
+    shader->setUniformMat4("projection", camera->projectionMatrix);
     shader->setUniform1i("blockPositionTexture", 0);
 
     // debugging
@@ -109,5 +109,5 @@ void Renderer::render(Window* const &window, Shader* const &shader, Camera* cons
     // std::cout << std::endl;
 
     // draw stuff
-    glDrawElementsInstanced(GL_TRIANGLES, BLOCK_INDICES_LENGTH, GL_UNSIGNED_INT, (void*)0, positionData.size() / 3);
+    glDrawElementsInstanced(GL_TRIANGLES, BLOCK_INDICES_LENGTH, GL_UNSIGNED_INT, (void*)0, numInstances);
 }
